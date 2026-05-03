@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS push_notifications (
   target_state    TEXT,
   target_class    TEXT,
   target_subject  TEXT,
-  target_ar_topic UUID REFERENCES curriculum_topics(id) ON DELETE SET NULL,
+  target_ar_topic UUID REFERENCES curriculum_nodes(id) ON DELETE SET NULL,
   target_quiz_id  UUID REFERENCES quizzes(id) ON DELETE SET NULL,
   deep_link_type  TEXT CHECK (deep_link_type IN ('ar_topic','quiz') OR deep_link_type IS NULL),
   deep_link_id    TEXT,
