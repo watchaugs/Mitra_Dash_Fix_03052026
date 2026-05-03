@@ -42,11 +42,12 @@ app.use(helmet({
     directives: {
       defaultSrc:     ["'self'"],
       scriptSrc:      ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+      scriptSrcAttr:  ["'unsafe-inline'"],  // <-- FIX 1: Allows inline button clicks
       styleSrc:       ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
       fontSrc:        ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
       imgSrc:         ["'self'", "data:", "blob:", "https:"],
       connectSrc:     ["'self'", "https://fcm.googleapis.com", "https://cdn.jsdelivr.net", process.env.ALLOWED_ORIGINS || ""].filter(Boolean),
-      frameSrc:       ["'none'"],
+      frameSrc:       ["'self'", "blob:"],  // <-- FIX 2: Allows the blob preview windows
       objectSrc:      ["'none'"],
     }
   },
