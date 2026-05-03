@@ -3522,15 +3522,27 @@ function toggleState(el) {
 }
 
 // --- UNITY UPLOAD SIMULATION ---
-const uz = document.getElementById('uzone');
-['dragenter','dragover','dragleave','drop'].forEach(ev => uz.addEventListener(ev, pD, false));
+document.addEventListener("DOMContentLoaded", () => {
+  const uz = document.getElementById('uzone');
+  
+  // Safety check: Only attach listeners if the 'uzone' box actually exists on this page
+  if (uz) {
+    ['dragenter','dragover','dragleave','drop'].forEach(ev => uz.addEventListener(ev, pD, false));
+    
+    uz.addEventListener('dragenter', () => uz.classList.add('drag'), false);
+    uz.addEventListener('dragleave', () => uz.classList.remove('drag'), false);
+    uz.addEventListener('drop', (e) => {
+      uz.classList.remove('drag');
+      if(e.dataTransfer.files.length) handleFileUpload(e.dataTransfer.files[0]);
+    }, false);
+  } else {
+    console.warn("Could not find the 'uzone' element on this page.");
+  }
+});
+
 function pD(e){e.preventDefault();e.stopPropagation();}
-uz.addEventListener('dragenter', () => uz.classList.add('drag'), false);
-uz.addEventListener('dragleave', () => uz.classList.remove('drag'), false);
-uz.addEventListener('drop', (e) => {
-  uz.classList.remove('drag');
-  if(e.dataTransfer.files.length) handleFileUpload(e.dataTransfer.files[0]);
-}, false);
+
+// ... (keep the rest of your handleFileUpload and simPipeline functions exactly as they are)
 
 function handleFileUpload(input) {
   let file;
