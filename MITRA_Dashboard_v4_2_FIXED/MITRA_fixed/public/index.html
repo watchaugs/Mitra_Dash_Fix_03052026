@@ -3655,7 +3655,16 @@ function initAllCharts() {
   Chart.defaults.plugins.legend.labels.boxWidth = 12;
 
   const createChart = (id, type, labels, datasets, options = {}) => {
-    new Chart(document.getElementById(id), {
+    // Safety check: Find the canvas first
+    const canvasElement = document.getElementById(id);
+    
+    // If the canvas doesn't exist on this page, politely skip it instead of crashing
+    if (!canvasElement) {
+      console.warn(`Skipped chart: Could not find HTML canvas with id '${id}'`);
+      return; 
+    }
+
+    new Chart(canvasElement, {
       type: type,
       data: { labels: labels, datasets: datasets },
       options: {
