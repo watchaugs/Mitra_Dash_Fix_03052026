@@ -45,7 +45,7 @@ app.use(helmet({
       styleSrc:       ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
       fontSrc:        ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
       imgSrc:         ["'self'", "data:", "blob:", "https:"],
-      connectSrc:     ["'self'", "https://fcm.googleapis.com", process.env.ALLOWED_ORIGINS || ""].filter(Boolean),
+      connectSrc:     ["'self'", "https://fcm.googleapis.com", "https://cdn.jsdelivr.net", process.env.ALLOWED_ORIGINS || ""].filter(Boolean),
       frameSrc:       ["'none'"],
       objectSrc:      ["'none'"],
     }
