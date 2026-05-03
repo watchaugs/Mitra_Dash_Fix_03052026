@@ -130,14 +130,18 @@ async function seed() {
   }
 
   for (const row of impRows) {
+    // Safety check: If the array has 18 items (meaning it includes a fake UUID for the ID), 
+    // slice off the first item so we only send the 17 real data points.
+    const cleanRow = row.length === 18 ? row.slice(1) : row;
+
     await query(`
       INSERT INTO ad_impressions (
-        id, campaign_id, device_id, student_id, state, district,
+        campaign_id, device_id, student_id, state, district,
         class_grade, age_group, subject_context, app_language,
         media_type, view_seconds, completed, clicked, skipped, is_repeat,
         repeat_count, viewed_at
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
-    `, row);
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+    `, cleanRow);
   }
   console.log('✅ 500 sample ad impression rows seeded');
 
