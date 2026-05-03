@@ -3383,6 +3383,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </div>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <button class="btn btn-s btn-sm" onclick="openEditUser('u001', 'Rahul Sharma', '+91 98765 43210', 'district_officer')">✏️ Edit</button>
 let chartsInitialized = false;
 
 // --- NAVIGATION ---
@@ -8823,4 +8824,61 @@ async function loadQuizAnalyticsDeep() {
     </div>`;
 }
 
+// --- DYNAMIC USER PERMISSIONS ENGINE ---
+
+// 1. Define all available permissions and which roles get them automatically
+const APP_PERMISSIONS = [
+  { id: 'publish', name: 'Publish AR Apps', defaultRoles: ['master_admin', 'admin', 'education_secretary'] },
+  { id: 'unity', name: 'Upload Unity Files', defaultRoles: ['master_admin', 'admin', 'developer', 'upload_authority'] },
+  { id: 'geo', name: 'Manage Geofences', defaultRoles: ['master_admin', 'admin'] },
+  { id: 'analytics', name: 'View Analytics', defaultRoles: ['master_admin', 'admin', 'district_officer', 'analytics_only'] },
+  { id: 'users', name: 'Manage Users', defaultRoles: ['master_admin', 'admin'] },
+  { id: 'curr', name: 'Edit Curriculum Map', defaultRoles: ['master_admin', 'admin', 'dept_education'] },
+  { id: 'approve', name: 'Approve Content', defaultRoles: ['master_admin', 'admin', 'education_secretary'] },
+  { id: 'ads', name: 'Advertisement Manager', defaultRoles: ['master_admin', 'admin'] }
+];
+
+// 2. Function to draw the toggles inside the popup
+function applyRolePreset(selectedRole, prefix = 'eu') {
+  const grid = document.getElementById(prefix + '-perms-grid');
+  if (!grid) return;
+
+  // Build the toggle switches HTML on the fly
+  let togglesHTML = '';
+  APP_PERMISSIONS.forEach(perm => {
+    // Check if the selected role should have this toggle turned ON by default
+    const isChecked = perm.defaultRoles.includes(selectedRole) ? 'checked' : '';
+    
+    togglesHTML += `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:6px">
+        <span>${perm.name}</span>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="${prefix}-perm-${perm.id}" ${isChecked}>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    `;
+  });
+
+  // Inject the newly drawn toggles into the popup
+  grid.innerHTML = togglesHTML;
+}
+
+// 3. Function to trigger when you click the "Edit" button
+function openEditUser(id, name, phone, role) {
+  // Pre-fill the basic text fields
+  document.getElementById('eu-id').value = id;
+  document.getElementById('eu-name').value = name;
+  document.getElementById('eu-phone').value = phone;
+  
+  // Set the Role Dropdown to the user's current role
+  document.getElementById('eu-role').value = role;
+  
+  // Tell the engine to draw the toggles for this specific role
+  applyRolePreset(role, 'eu');
+  
+  // Finally, open the popup
+  document.getElementById('modal-edit-user').classList.add('open');
+}
+  
 </script>
