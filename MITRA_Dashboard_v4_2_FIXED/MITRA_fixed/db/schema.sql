@@ -199,8 +199,8 @@ CREATE TABLE ad_impressions (
   is_repeat       BOOLEAN DEFAULT FALSE,
   repeat_count    INT DEFAULT 1,
   viewed_at       TIMESTAMPTZ DEFAULT NOW(),
-  hour_of_day     SMALLINT GENERATED ALWAYS AS (EXTRACT(HOUR FROM viewed_at)::SMALLINT) STORED,
-  day_of_week     SMALLINT GENERATED ALWAYS AS (EXTRACT(DOW  FROM viewed_at)::SMALLINT) STORED
+  hour_of_day     SMALLINT GENERATED ALWAYS AS (EXTRACT(HOUR FROM viewed_at AT TIME ZONE 'UTC')::SMALLINT) STORED,
+  day_of_week     SMALLINT GENERATED ALWAYS AS (EXTRACT(DOW  FROM viewed_at AT TIME ZONE 'UTC')::SMALLINT) STORED
 );
 
 -- ─── STUDENT APP TELEMETRY ────────────────────────────────────────────────────
