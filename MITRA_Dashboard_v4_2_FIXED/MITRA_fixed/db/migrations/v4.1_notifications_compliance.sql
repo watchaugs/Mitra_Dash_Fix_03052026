@@ -152,11 +152,11 @@ ALTER TABLE push_notifications ENABLE ROW LEVEL SECURITY;
 
 -- Only admins (role checked at app layer; these are belt-and-suspenders)
 -- Note: Your app layer auth should also enforce this
-CREATE POLICY IF NOT EXISTS audit_logs_admin_only
+CREATE POLICY audit_logs_admin_only
   ON audit_logs FOR ALL
   USING (current_setting('app.user_role', TRUE) IN ('admin','superadmin'));
 
-CREATE POLICY IF NOT EXISTS push_notifs_staff_read
+CREATE POLICY push_notifs_staff_read
   ON push_notifications FOR SELECT
   USING (current_setting('app.user_role', TRUE) IN ('admin','superadmin','teacher','district'));
 
