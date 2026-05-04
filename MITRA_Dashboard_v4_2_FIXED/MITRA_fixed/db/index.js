@@ -52,17 +52,19 @@ async function testConnection() {
 
     // --- NEW CODE: Build the missing table automatically ---
     const createTableQuery = `
-      CREATE TABLE IF NOT EXISTS quiz_attempt_answers (
+      DROP TABLE IF EXISTS quiz_attempt_answers;
+      
+      CREATE TABLE quiz_attempt_answers (
           id SERIAL PRIMARY KEY,
-          attempt_id INTEGER,
-          question_id INTEGER,
+          attempt_id UUID,
+          question_id UUID,
           selected_option VARCHAR(1),
           is_correct BOOLEAN,
           created_at TIMESTAMP DEFAULT NOW()
       );
     `;
     await pool.query(createTableQuery);
-    console.log('✅ Missing quiz_attempt_answers table ensured');
+    console.log('✅ Missing quiz_attempt_answers table rebuilt with UUIDs');
     // -------------------------------------------------------
 
   } catch (err) {
