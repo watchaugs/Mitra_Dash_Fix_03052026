@@ -282,8 +282,8 @@ router.get('/analytics', async (req, res) => {
             SUM(COALESCE(na.delivered,0)) AS total_delivered,
             SUM(COALESCE(na.opened,0))    AS total_opened,
             SUM(COALESCE(na.clicked,0))   AS total_clicked,
-            ROUND(AVG(CASE WHEN na.delivered > 0 THEN na.opened::float/na.delivered*100 END),1) AS avg_open_rate,
-            ROUND(AVG(CASE WHEN na.opened > 0 THEN na.clicked::float/na.opened*100 END),1) AS avg_ctr
+            ROUND(AVG(CASE WHEN na.delivered > 0 THEN na.opened::float/na.delivered*100 END)::numeric, 1) AS avg_open_rate,
+            ROUND(AVG(CASE WHEN na.opened > 0 THEN na.clicked::float/na.opened*100 END)::numeric, 1) AS avg_ctr
           FROM push_notifications n
           LEFT JOIN notification_analytics na ON na.notification_id = n.id
           ${whereClause}`, params),
