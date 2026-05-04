@@ -2851,8 +2851,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:12px">🎯 Audience Targeting</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
             <div><label class="lbl">Target State</label><select class="sel" id="notif-state" onchange="updateFcmTopicPreview()"><option value="">All States</option></select></div>
-            <div><label class="lbl">Class / Grade</label><select class="sel" id="notif-class" onchange="updateFcmTopicPreview()"><option value="">All Classes</option></select></div>
-            <div><label class="lbl">Subject</label><select class="sel" id="notif-subject" onchange="updateFcmTopicPreview()"><option value="">All Subjects</option></select></div>
+            <div><label class="lbl">Class / Grade</label>
+           <select class="sel" id="notif-class" onchange="updateFcmTopicPreview()">
+             <option value="">All Classes</option>
+             <option>Class 1</option><option>Class 2</option><option>Class 3</option>
+             <option>Class 4</option><option>Class 5</option><option>Class 6</option>
+             <option>Class 7</option><option>Class 8</option><option>Class 9</option>
+             <option>Class 10</option><option>Class 11</option><option>Class 12</option>
+           </select>
+         </div>
+         <div><label class="lbl">Subject</label>
+           <select class="sel" id="notif-subject" onchange="updateFcmTopicPreview()">
+             <option value="">All Subjects</option>
+             <option>Science</option><option>Mathematics</option><option>History</option>
+             <option>Geography</option><option>Biology</option><option>Chemistry</option>
+             <option>Physics</option><option>Languages</option><option>Civics</option>
+             <option>Economics</option><option>Environmental Science</option>
+           </select>
+         </div>
             <div><label class="lbl">AR Topic</label><select class="sel" id="notif-topic" onchange="onNotifTopicChange()"><option value="">No Topic Filter</option></select></div>
           </div>
           <div style="margin-top:10px"><label class="lbl">Quiz</label><select class="sel" id="notif-quiz"><option value="">No Quiz Filter</option></select></div>
@@ -4204,7 +4220,7 @@ function populateAllLocationDropdowns() {
   ];
 
   // Populate state dropdowns
-  const stateDropdownIds = ['hier-state','rp-state','qc-state','qa-state'];
+  const stateDropdownIds = ['hier-state','rp-state','qc-state','qa-state','notif-state'];
   // Also populate hier-add-state
   const hierAddState = document.getElementById('hier-add-state');
   if (hierAddState) {
