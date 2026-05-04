@@ -3147,7 +3147,37 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           </tr>
         </thead>
         <tbody id="um-user-tbody">
-          <tr><td colspan="10" style="text-align:center;padding:28px;color:var(--text3)">Loading users…</td></tr>
+          <!-- Sample User 1 -->
+          <tr>
+            <td><input type="checkbox"></td>
+            <td><strong>Rahul Sharma</strong></td>
+            <td>rahul@education.gov.in</td>
+            <td>+91 98765 43210</td>
+            <td><span class="tag tag-y">District Officer</span></td>
+            <td>Uttar Pradesh</td>
+            <td>Lucknow</td>
+            <td><span class="sdot green"></span>Active</td>
+            <td>Just now</td>
+            <td>
+              <button class="btn btn-s btn-sm" onclick="openEditUser('u001', 'Rahul Sharma', '+91 98765 43210', 'district_officer')">✏️ Edit</button>
+            </td>
+          </tr>
+          
+          <!-- Sample User 2 -->
+          <tr>
+            <td><input type="checkbox"></td>
+            <td><strong>Priya Patel</strong></td>
+            <td>priya.p@education.gov.in</td>
+            <td>+91 91234 56789</td>
+            <td><span class="tag tag-b">Admin</span></td>
+            <td>Gujarat</td>
+            <td>Ahmedabad</td>
+            <td><span class="sdot green"></span>Active</td>
+            <td>2 hrs ago</td>
+            <td>
+              <button class="btn btn-s btn-sm" onclick="openEditUser('u002', 'Priya Patel', '+91 91234 56789', 'admin')">✏️ Edit</button>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
