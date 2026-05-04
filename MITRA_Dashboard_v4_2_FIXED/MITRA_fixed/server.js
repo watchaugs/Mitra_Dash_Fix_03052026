@@ -33,9 +33,10 @@ const advertisementsRoutes  = require('./routes/advertisements'); // BUG-FIX #1
 const tenantRoutes          = require('./routes/tenant');          // NEW: Tenant DB Links
 const geofenceRoutes        = require('./routes/geofence');        // FIX: was never registered
 
-const app  = express();
-const PORT = process.env.PORT || 3000;
+const app = express();
+app.set('trust proxy', 1); 
 
+const PORT = process.env.PORT || 3000;
 // ── Security & Performance ───────────────────────────────────────────────────
 app.use(helmet({
   contentSecurityPolicy: {
