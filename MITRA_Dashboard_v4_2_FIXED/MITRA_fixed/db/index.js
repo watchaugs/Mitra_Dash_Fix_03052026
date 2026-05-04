@@ -50,18 +50,18 @@ async function testConnection() {
     const res = await pool.query('SELECT NOW()');
     console.log('✅ PostgreSQL connected:', res.rows[0].now);
 
-// --- BULLETPROOF SCORE FIX ---
-    try {
-      console.log("⏳ Attempting to add the score_pct column...");
-      await pool.query(`
-        ALTER TABLE quiz_attempts 
-        ADD COLUMN IF NOT EXISTS score_pct INTEGER;
-      `);
-      console.log("💯💯💯 SCORE BOX ADDED SUCCESSFULLY! 💯💯💯");
-    } catch (err) {
-      console.log("🚨 DATABASE FIX FAILED:", err.message);
-    }
-    // --------------------------------
+// --- BULLETPROOF DATABASE UPDATES ---
+try {
+  console.log("⏳ Checking for missing user columns...");
+  
+  // This is the new line you are adding:
+  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'viewer';`);
+  
+  console.log("✅ ROLE COLUMN IS READY!");
+} catch (err) {
+  console.log("🚨 DATABASE UPDATE FAILED:", err.message);
+}
+// ------------------------------------
     
   } catch (err) {
     console.error('❌ PostgreSQL connection failed:', err.message);
