@@ -112,14 +112,33 @@ router.post('/bulk-update', requirePerm('perm_create_users'), async (req, res) =
   try {
     const { ids, role, is_active } = req.body;
     if (!ids?.length) return res.status(400).json({ error: 'No user IDs provided' });
-    const updates = []; const params = []; let pi = 1;
-    if (role !== undefined)      { updates.push(`role = $${pi++}`);      params.push(role); }
-    if (is_active !== undefined) { updates.push(`is_active = $${pi++}`); params.push(is_active); }
+    
+    const updates = []; 
+    const params = []; 
+    let pi = 1;
+    
+    if (role !== undefined) { 
+      updates.push(`role = $${pi++}`);      
+      params.push(role); 
+    }
+    if (is_active !== undefined) { 
+      updates.push(`is_active = $${pi++}`); 
+      params.push(is_active); 
+    }
+    
     if (!updates.length) return res.status(400).json({ error: 'Nothing to update' });
+    
     params.push(ids);
-    await query(`UPDATE users SET ${updates.join(', ')}, updated_at=NOW() WHERE id = ANY($${pi})`, params);
+    
+    // ✅ THE FIX: Added ::text[] to tell PostgreSQL exactly what type of array this is
+    await query(`UPDATE users SET ${updates.join(', ')}, updated_at=NOW() WHERE id = ANY($${pi}::text[])`, params);
+    
     res.json({ success: true, updated: ids.length });
-  } catch (e) { res.status(500).json({ error: 'Bulk update failed' }); }
+  } catch (e) { 
+    // ✅ PRO-TIP: Print the actual error to your Render logs so it's easier to fix next time!
+    console.error("Bulk update error:", e); 
+    res.status(500).json({ error: 'Bulk update failed' }); 
+  }
 });
 
 // ── Bulk Delete — CRITICAL FIX: must be registered BEFORE /:id route ─────────
