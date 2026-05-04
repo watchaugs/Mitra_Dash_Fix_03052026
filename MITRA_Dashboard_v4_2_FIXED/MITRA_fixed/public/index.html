@@ -3417,46 +3417,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 <script>
 // --- DYNAMIC USER PERMISSIONS ENGINE ---
-const APP_PERMISSIONS = [
-  { id: 'publish', name: 'Publish AR Apps', defaultRoles: ['master_admin', 'admin', 'education_secretary'] },
-  { id: 'unity', name: 'Upload Unity Files', defaultRoles: ['master_admin', 'admin', 'developer', 'upload_authority'] },
-  { id: 'geo', name: 'Manage Geofences', defaultRoles: ['master_admin', 'admin'] },
-  { id: 'analytics', name: 'View Analytics', defaultRoles: ['master_admin', 'admin', 'district_officer', 'analytics_only'] },
-  { id: 'users', name: 'Manage Users', defaultRoles: ['master_admin', 'admin'] },
-  { id: 'curr', name: 'Edit Curriculum Map', defaultRoles: ['master_admin', 'admin', 'dept_education'] },
-  { id: 'approve', name: 'Approve Content', defaultRoles: ['master_admin', 'admin', 'education_secretary'] },
-  { id: 'ads', name: 'Advertisement Manager', defaultRoles: ['master_admin', 'admin'] }
-];
-
-function applyRolePreset(selectedRole, prefix = 'eu') {
-  const grid = document.getElementById(prefix + '-perms-grid');
-  if (!grid) return;
-  let togglesHTML = '';
-  APP_PERMISSIONS.forEach(perm => {
-    const isChecked = perm.defaultRoles.includes(selectedRole) ? 'checked' : '';
-    togglesHTML += `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:12px;margin-bottom:6px">
-        <span>${perm.name}</span>
-        <label class="toggle-wrap">
-          <input type="checkbox" id="${prefix}-perm-${perm.id}" ${isChecked}>
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-    `;
-  });
-  grid.innerHTML = togglesHTML;
-}
-
-function openEditUser(id, name, phone, role) {
-  document.getElementById('eu-id').value = id;
-  document.getElementById('eu-name').value = name;
-  document.getElementById('eu-phone').value = phone;
-  document.getElementById('eu-role').value = role;
-  applyRolePreset(role, 'eu');
-  document.getElementById('modal-edit-user').classList.add('open');
-}
-// ----------------------------------------
-
 let chartsInitialized = false;
 
 // --- NAVIGATION ---
