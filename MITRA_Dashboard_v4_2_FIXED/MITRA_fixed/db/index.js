@@ -49,6 +49,22 @@ async function testConnection() {
   try {
     const res = await pool.query('SELECT NOW()');
     console.log('✅ PostgreSQL connected:', res.rows[0].now);
+
+    // --- NEW CODE: Build the missing table automatically ---
+    const createTableQuery = `
+      CREATE TABLE IF NOT EXISTS quiz_attempt_answers (
+          id SERIAL PRIMARY KEY,
+          attempt_id INTEGER,
+          question_id INTEGER,
+          selected_option VARCHAR(1),
+          is_correct BOOLEAN,
+          created_at TIMESTAMP DEFAULT NOW()
+      );
+    `;
+    await pool.query(createTableQuery);
+    console.log('✅ Missing quiz_attempt_answers table ensured');
+    // -------------------------------------------------------
+
   } catch (err) {
     console.error('❌ PostgreSQL connection failed:', err.message);
     console.error('   Check your .env DB_* settings and that PostgreSQL is running.');
