@@ -578,7 +578,39 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="modal-close" onclick="closeModal('modal-edit-user')">✕</button>
     <div class="modal-title" id="edit-user-title">Edit Permissions</div>
     <div class="modal-sub" id="edit-user-sub">Adjust feature access and rights</div>
-    <div class="perm-grid" id="edit-perm-grid"></div>
+    <div class="perm-grid" id="edit-perm-grid">
+  <!-- Role Selection -->
+  <div style="margin-bottom: 20px;">
+    <div class="lbl" style="margin-bottom:8px">User Role</div>
+    <select id="user-role-select" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card); color: var(--text-main);">
+      <option value="admin">Administrator</option>
+      <option value="teacher">Teacher</option>
+      <option value="viewer">Viewer</option>
+    </select>
+  </div>
+
+  <div class="lbl" style="margin-bottom:12px">Access Permissions</div>
+  
+  <!-- Modern Toggle Buttons -->
+  <div style="display: flex; flex-direction: column; gap: 12px;">
+    <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+      <span>Analytics Dashboard</span>
+      <input type="checkbox" class="tgl-btn" id="p-analytics" checked>
+    </label>
+    <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+      <span>Quiz Builder</span>
+      <input type="checkbox" class="tgl-btn" id="p-quiz">
+    </label>
+    <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+      <span>User Management</span>
+      <input type="checkbox" class="tgl-btn" id="p-users">
+    </label>
+    <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+      <span>Settings & Legal</span>
+      <input type="checkbox" class="tgl-btn" id="p-settings">
+    </label>
+  </div>
+</div>
     <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
       <div class="lbl" style="margin-bottom:10px">Account Status</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
