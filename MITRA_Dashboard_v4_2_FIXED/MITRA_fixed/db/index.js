@@ -50,29 +50,17 @@ async function testConnection() {
     const res = await pool.query('SELECT NOW()');
     console.log('✅ PostgreSQL connected:', res.rows[0].now);
 
-// --- THE FINAL DB CLEAN SWEEP ---
-    const finalDbFixQuery = `
-      -- 1. Rebuild the answers table perfectly
-      DROP TABLE IF EXISTS quiz_attempt_answers;
-      CREATE TABLE quiz_attempt_answers (
-          id SERIAL PRIMARY KEY,
-          attempt_id BIGINT,
-          question_id UUID,
-          selected_option VARCHAR(1),
-          is_correct BOOLEAN,
-          created_at TIMESTAMP DEFAULT NOW()
-      );
-
-      -- 2. Add the missing completion timestamp
-      ALTER TABLE quiz_attempts 
-      ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP;
-
-      -- 3. Add the missing stopwatch box
-      ALTER TABLE quiz_attempts 
-      ADD COLUMN IF NOT EXISTS time_taken_seconds INTEGER;
-    `;
-    await pool.query(finalDbFixQuery);
-    console.log('✅ Final missing columns and tables rebuilt perfectly!');
+// --- BULLETPROOF DATABASE FIX ---
+    try {
+      console.log("⏳ Attempting to add the stopwatch column...");
+      await pool.query(`
+        ALTER TABLE quiz_attempts 
+        ADD COLUMN IF NOT EXISTS time_taken_seconds INTEGER;
+      `);
+      console.log("⭐⭐⭐ STOPWATCH BOX ADDED SUCCESSFULLY! ⭐⭐⭐");
+    } catch (err) {
+      console.log("🚨 DATABASE FIX FAILED:", err.message);
+    }
     // --------------------------------
     
   } catch (err) {
