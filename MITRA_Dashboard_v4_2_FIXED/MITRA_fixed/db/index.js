@@ -50,7 +50,7 @@ async function testConnection() {
     const res = await pool.query('SELECT NOW()');
     console.log('✅ PostgreSQL connected:', res.rows[0].now);
 
-  // --- THE FINAL DB CLEAN SWEEP ---
+// --- THE FINAL DB CLEAN SWEEP ---
     const finalDbFixQuery = `
       -- 1. Rebuild the answers table perfectly
       DROP TABLE IF EXISTS quiz_attempt_answers;
