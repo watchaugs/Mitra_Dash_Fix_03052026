@@ -131,7 +131,7 @@ router.post('/bulk-update', requirePerm('perm_create_users'), async (req, res) =
     params.push(ids);
     
     // ✅ THE FIX: Added ::text[] to tell PostgreSQL exactly what type of array this is
-    await query(`UPDATE users SET ${updates.join(', ')}, updated_at=NOW() WHERE id = ANY($${pi}::text[])`, params);
+    await query(`UPDATE users SET ${updates.join(', ')}, updated_at=NOW() WHERE id = ANY($${pi}::uuid[])`, params);
     
     res.json({ success: true, updated: ids.length });
   } catch (e) { 
@@ -146,7 +146,7 @@ router.delete('/bulk-delete', requirePerm('perm_create_users'), async (req, res)
   try {
     const { ids } = req.body;
     if (!ids?.length) return res.status(400).json({ error: 'No user IDs provided' });
-    const result = await query(`DELETE FROM users WHERE id = ANY($1) RETURNING id`, [ids]);
+    const result = await query(`DELETE FROM users WHERE id = ANY($1::uuid[]) RETURNING id`, [ids]);
     res.json({ success: true, deleted: result.rowCount });
   } catch (e) { res.status(500).json({ error: 'Bulk delete failed' }); }
 });
