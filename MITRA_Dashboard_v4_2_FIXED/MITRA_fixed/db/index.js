@@ -50,10 +50,10 @@ async function testConnection() {
     const res = await pool.query('SELECT NOW()');
     console.log('✅ PostgreSQL connected:', res.rows[0].now);
 
-  // --- NEW CODE: Build the missing table automatically ---
-    const createTableQuery = `
+  // --- THE FINAL DB CLEAN SWEEP ---
+    const finalDbFixQuery = `
+      -- 1. Rebuild the answers table perfectly
       DROP TABLE IF EXISTS quiz_attempt_answers;
-      
       CREATE TABLE quiz_attempt_answers (
           id SERIAL PRIMARY KEY,
           attempt_id BIGINT,
@@ -62,24 +62,18 @@ async function testConnection() {
           is_correct BOOLEAN,
           created_at TIMESTAMP DEFAULT NOW()
       );
-    `;
-    await pool.query(createTableQuery);
-    console.log('✅ Missing quiz_attempt_answers table rebuilt with BIGINT and UUID');
-    // --- NEW CODE: Add the missing completed_at timestamp ---
-    const fixAttemptsQuery = `
+
+      -- 2. Add the missing completion timestamp
       ALTER TABLE quiz_attempts 
       ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP;
-    `;
-    await pool.query(fixAttemptsQuery);
-    console.log('✅ Added missing completed_at column to quiz_attempts');
-    // --- NEW CODE: Add the missing time_taken_seconds column ---
-    const fixTimeQuery = `
+
+      -- 3. Add the missing stopwatch box
       ALTER TABLE quiz_attempts 
       ADD COLUMN IF NOT EXISTS time_taken_seconds INTEGER;
     `;
-    await pool.query(fixTimeQuery);
-    console.log('✅ Added missing time_taken_seconds column to quiz_attempts');
-    // -----------------------------------------------------------
+    await pool.query(finalDbFixQuery);
+    console.log('✅ Final missing columns and tables rebuilt perfectly!');
+    // --------------------------------
     
   } catch (err) {
     console.error('❌ PostgreSQL connection failed:', err.message);
