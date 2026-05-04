@@ -50,14 +50,14 @@ async function testConnection() {
     const res = await pool.query('SELECT NOW()');
     console.log('✅ PostgreSQL connected:', res.rows[0].now);
 
-// --- BULLETPROOF DATABASE FIX ---
+// --- BULLETPROOF SCORE FIX ---
     try {
-      console.log("⏳ Attempting to add the stopwatch column...");
+      console.log("⏳ Attempting to add the score_pct column...");
       await pool.query(`
         ALTER TABLE quiz_attempts 
-        ADD COLUMN IF NOT EXISTS time_taken_seconds INTEGER;
+        ADD COLUMN IF NOT EXISTS score_pct INTEGER;
       `);
-      console.log("⭐⭐⭐ STOPWATCH BOX ADDED SUCCESSFULLY! ⭐⭐⭐");
+      console.log("💯💯💯 SCORE BOX ADDED SUCCESSFULLY! 💯💯💯");
     } catch (err) {
       console.log("🚨 DATABASE FIX FAILED:", err.message);
     }
