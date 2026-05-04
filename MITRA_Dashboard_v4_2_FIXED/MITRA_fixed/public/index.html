@@ -3433,7 +3433,72 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 <script>
 // --- DYNAMIC USER PERMISSIONS ENGINE ---
-let chartsInitialized = false;
+const APP_PERMISSIONS = [
+    { id: 'publish', label: 'Publish AR Apps', defaultRoles: ['master_admin', 'admin', 'upload_authority'] },
+    { id: 'unity', label: 'Upload Unity Files', defaultRoles: ['master_admin', 'admin', 'developer', 'upload_authority'] },
+    { id: 'geo', label: 'Manage Geofences', defaultRoles: ['master_admin', 'admin'] },
+    { id: 'analytics', label: 'View Analytics', defaultRoles: ['master_admin', 'admin', 'district_officer', 'education_secretary', 'dept_education', 'analytics_only'] },
+    { id: 'users', label: 'Create Users', defaultRoles: ['master_admin', 'admin'] },
+    { id: 'curr', label: 'Edit Curriculum Map', defaultRoles: ['master_admin', 'admin', 'education_secretary'] },
+    { id: 'approve', label: 'Approve Content', defaultRoles: ['master_admin', 'admin', 'dept_education'] },
+    { id: 'export', label: 'Export Data', defaultRoles: ['master_admin', 'admin', 'district_officer', 'analytics_only'] },
+    { id: 'ads', label: '📣 Advertisement Manager', defaultRoles: ['master_admin'] },
+    { id: 'replay', label: 'Replay Analytics Access', defaultRoles: ['master_admin', 'admin', 'district_officer', 'analytics_only'] }
+  ];
+
+  function renderPermGrid(containerId, prefix) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = APP_PERMISSIONS.map(p => `
+      <div class="perm-item" ${p.id==='ads'?'style="border-color:rgba(236,72,153,.3);background:rgba(236,72,153,.05)"':''}>
+        <span ${p.id==='ads'?'style="color:#f9a8d4"':''}>${p.label}</span>
+        <label class="toggle-wrap">
+          <input type="checkbox" id="${prefix}-${p.id}">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    `).join('');
+  }
+
+  function applyRolePreset(role, prefix = 'cu') {
+    APP_PERMISSIONS.forEach(p => {
+      const cb = document.getElementById(`${prefix}-${p.id}`);
+      if (cb) cb.checked = p.defaultRoles.includes(role);
+    });
+  }
+
+  function openEditUser(id, name, phone, role) {
+    // Fill in the text boxes
+    document.getElementById('eu-id').value = id;
+    document.getElementById('eu-name').value = name;
+    document.getElementById('eu-phone').value = phone;
+    
+    // Set the Dropdown
+    const roleDropdown = document.getElementById('eu-role');
+    if (roleDropdown) roleDropdown.value = role;
+    
+    // Build the Toggle Buttons if they aren't there yet
+    const grid = document.getElementById('eu-perms-grid');
+    if (grid && grid.innerHTML.trim() === '') {
+      renderPermGrid('eu-perms-grid', 'eu');
+    }
+    
+    // Automatically turn toggles on/off based on the role
+    applyRolePreset(role, 'eu');
+    
+    openModal('modal-edit-user');
+  }
+
+  function saveUserEdit() {
+    closeModal('modal-edit-user');
+    showToast('💾 User access updated successfully!');
+  }
+
+  // Build the toggles for the "Create User" window as soon as the page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    renderPermGrid('cu-perms-grid', 'cu');
+  });
+  let chartsInitialized = false;
 
 // --- NAVIGATION ---
 /* showPage — canonical version below in Step 11 block; this stub delegates */
