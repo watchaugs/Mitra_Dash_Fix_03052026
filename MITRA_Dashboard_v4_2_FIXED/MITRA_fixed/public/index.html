@@ -1740,6 +1740,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){.split-pane{grid-template-columns:1fr;height:auto}.phone-shell.portrait{width:160px;height:320px}.build-format-grid{grid-template-columns:repeat(2,1fr)}.icon-grid{grid-template-columns:repeat(4,1fr)}}
+/* Turns boring checkboxes into modern sliding Toggle Buttons */
+.tgl-btn {
+  appearance: none;
+  width: 40px; height: 20px;
+  background: #ccc; border-radius: 20px;
+  position: relative; cursor: pointer; transition: 0.3s;
+  display: inline-block;
+  vertical-align: middle;
+}
+.tgl-btn:checked { background: #4CAF50; }
+.tgl-btn::before {
+  content: ''; position: absolute; width: 16px; height: 16px;
+  background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s;
+}
+.tgl-btn:checked::before { transform: translateX(20px); }
 </style>
 
 <!-- HERO -->
