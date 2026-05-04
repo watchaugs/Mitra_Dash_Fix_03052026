@@ -6092,11 +6092,18 @@ function amRenderHtmlPreview() {
   const src = document.getElementById('preview-html-src');
   const iframe = document.getElementById('preview-iframe');
   if (!src || !iframe) return;
-  const blob = new Blob([src.value], { type: 'text/html' });
+
+  // --- NEW CODE: Force HTML5 Standards Mode to prevent Quirks Mode ---
+  let htmlContent = src.value;
+  if (!htmlContent.toLowerCase().includes('<!doctype html>')) {
+    htmlContent = '<!DOCTYPE html>\n' + htmlContent;
+  }
+  // -------------------------------------------------------------------
+
+  const blob = new Blob([htmlContent], { type: 'text/html' });
   iframe.src = URL.createObjectURL(blob);
   showToast('📱 Preview refreshed');
 }
-
 function amToggleOrientation() {
   amPhonePortrait = !amPhonePortrait;
   const shell = document.getElementById('phone-shell');
