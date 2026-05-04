@@ -616,7 +616,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn btn-g btn-sm" id="edit-status-btn" onclick="toggleUserStatus()">Disable Account</button>
         <button class="btn btn-r btn-sm" onclick="resetPassword()">Reset Password</button>
-        <button class="btn btn-s btn-sm" onclick="closeModal('modal-edit-user');showToast('Changes saved')">Save Changes</button>
+        <button class="btn btn-s btn-sm" onclick="saveNewPermissions()">Save Changes</button>
       </div>
     </div>
   </div>
@@ -9042,7 +9042,19 @@ async function loadQuizAnalyticsDeep() {
     </div>`;
 }
 
-// --- DYNAMIC USER PERMISSIONS ENGINE ---
-
-// 1. Define all available permissions and which roles get them automatically
+//-----------------------------------------
+  function saveNewPermissions() {
+    // This grabs the data from your new dropdown and toggles
+    const role = document.getElementById('user-role-select').value;
+    const analyticsAccess = document.getElementById('p-analytics').checked;
+    
+    // For now, this just proves it works in your browser logs
+    console.log("New Role Saved:", role);
+    console.log("Analytics Access:", analyticsAccess);
+    
+    // Closes the window and shows your toast message
+    closeModal('modal-edit-user');
+    if(typeof showToast === 'function') showToast('Permissions Updated!');
+}
+  
 </script>
