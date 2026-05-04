@@ -4864,6 +4864,11 @@ document.addEventListener('DOMContentLoaded', function() {
   initCurriculumLangSelects();
   refreshArAssetList();
 
+  // --- NEW CODE: Fetch real data for Notification drop-downs ---
+  populateNotificationTopicDropdown();
+  populateNotificationQuizDropdown();
+  // -------------------------------------------------------------
+
   // Add onchange handlers to replay state selects
   const rpState = document.getElementById('rp-state');
   if (rpState) {
