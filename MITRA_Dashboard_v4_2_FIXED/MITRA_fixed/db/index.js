@@ -72,8 +72,15 @@ async function testConnection() {
     `;
     await pool.query(fixAttemptsQuery);
     console.log('✅ Added missing completed_at column to quiz_attempts');
-    // --------------------------------------------------------
-
+    // --- NEW CODE: Add the missing time_taken_seconds column ---
+    const fixTimeQuery = `
+      ALTER TABLE quiz_attempts 
+      ADD COLUMN IF NOT EXISTS time_taken_seconds INTEGER;
+    `;
+    await pool.query(fixTimeQuery);
+    console.log('✅ Added missing time_taken_seconds column to quiz_attempts');
+    // -----------------------------------------------------------
+    
   } catch (err) {
     console.error('❌ PostgreSQL connection failed:', err.message);
     console.error('   Check your .env DB_* settings and that PostgreSQL is running.');
