@@ -633,7 +633,7 @@ router.get('/analytics/deep', requirePerm('perm_view_analytics'), async (req, re
         qq.correct_answer,
         COUNT(qa.id)                                   AS attempts,
         ROUND(AVG(CASE WHEN qa.is_correct THEN 1 ELSE 0 END)::numeric * 100, 1) AS accuracy_pct,
-        ROUND(AVG(qa.time_taken_seconds)::numeric, 1)  AS avg_time_sec
+        ROUND(AVG(a.time_taken_seconds)::numeric, 1)  AS avg_time_sec
       FROM quiz_questions qq
       LEFT JOIN quiz_attempt_answers qa ON qa.question_id = qq.id
       LEFT JOIN quiz_attempts a ON a.id = qa.attempt_id AND a.completed_at >= $1
