@@ -50,13 +50,13 @@ async function testConnection() {
     const res = await pool.query('SELECT NOW()');
     console.log('✅ PostgreSQL connected:', res.rows[0].now);
 
-    // --- NEW CODE: Build the missing table automatically ---
+  // --- NEW CODE: Build the missing table automatically ---
     const createTableQuery = `
       DROP TABLE IF EXISTS quiz_attempt_answers;
       
       CREATE TABLE quiz_attempt_answers (
           id SERIAL PRIMARY KEY,
-          attempt_id UUID,
+          attempt_id BIGINT,
           question_id UUID,
           selected_option VARCHAR(1),
           is_correct BOOLEAN,
@@ -64,7 +64,7 @@ async function testConnection() {
       );
     `;
     await pool.query(createTableQuery);
-    console.log('✅ Missing quiz_attempt_answers table rebuilt with UUIDs');
+    console.log('✅ Missing quiz_attempt_answers table rebuilt with BIGINT and UUID');
     // -------------------------------------------------------
 
   } catch (err) {
