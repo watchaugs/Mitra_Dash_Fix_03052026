@@ -65,7 +65,14 @@ async function testConnection() {
     `;
     await pool.query(createTableQuery);
     console.log('✅ Missing quiz_attempt_answers table rebuilt with BIGINT and UUID');
-    // -------------------------------------------------------
+    // --- NEW CODE: Add the missing completed_at timestamp ---
+    const fixAttemptsQuery = `
+      ALTER TABLE quiz_attempts 
+      ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP;
+    `;
+    await pool.query(fixAttemptsQuery);
+    console.log('✅ Added missing completed_at column to quiz_attempts');
+    // --------------------------------------------------------
 
   } catch (err) {
     console.error('❌ PostgreSQL connection failed:', err.message);
