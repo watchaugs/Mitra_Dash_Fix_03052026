@@ -4856,7 +4856,52 @@ function escHtml(str) {
   if (!str) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+// ── Populators for Notification Page Dropdowns ────────────────────────────────
+async function populateNotificationTopicDropdown() {
+  const sel = document.getElementById('notif-topic');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">⌛ Loading Topics…</option>';
+  try {
+    // Fetch all AR Assets from the backend
+    const res = await fetch('/api/unity/assets?limit=500', { headers: authHeaders() });
+    const data = res.ok ? (await res.json()) : {};
+    const assets = data.data || data || [];
+    
+    // Deduplicate by topic name to keep the list clean
+    const topics = [...new Map(assets.filter(a => a.topic).map(a => [a.topic, a])).values()];
+    
+    if (!topics.length) {
+      sel.innerHTML = '<option value="">No AR Topics found</option>';
+    } else {
+      sel.innerHTML = '<option value="">All Topics</option>' +
+        topics.map(a => `<option value="${escHtml(a.id)}">${escHtml(a.topic)}</option>`).join('');
+    }
+  } catch(e) {
+    sel.innerHTML = '<option value="">Backend offline - No Topics</option>';
+  }
+}
 
+async function populateNotificationQuizDropdown() {
+  const sel = document.getElementById('notif-quiz');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">⌛ Loading Quizzes…</option>';
+  try {
+    // Fetch all Quizzes from the backend
+    const res = await fetch('/api/quiz?limit=500', { headers: authHeaders() });
+    const data = res.ok ? (await res.json()) : {};
+    const quizzes = data.data || [];
+    
+    if (!quizzes.length) {
+      sel.innerHTML = '<option value="">No Quizzes found</option>';
+    } else {
+      sel.innerHTML = '<option value="">All Quizzes</option>' +
+        quizzes.map(q => `<option value="${escHtml(q.id)}">${escHtml(q.title)}</option>`).join('');
+    }
+  } catch(e) {
+    sel.innerHTML = '<option value="">Backend offline - No Quizzes</option>';
+  }
+}
+// ------------------------------------------------------------------------------
 // ── Boot: populate all dropdowns when page loads ──────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
   populateAllLocationDropdowns();
