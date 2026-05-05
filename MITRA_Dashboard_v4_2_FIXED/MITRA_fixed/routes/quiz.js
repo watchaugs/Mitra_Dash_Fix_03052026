@@ -625,7 +625,7 @@ router.get('/analytics/deep', requirePerm('perm_view_analytics'), async (req, re
     const { quiz_id, days = 30 } = req.query;
     const since = new Date(Date.now() - parseInt(days) * 86400000).toISOString();
 
-    // 1. THE FIX: Prevent Postgres UUID crash by converting empty strings to strict nulls
+    // Prevent empty string crashes
     const validQuizId = (quiz_id && quiz_id.trim() !== '') ? quiz_id : null;
 
     // Per-question analysis
@@ -640,7 +640,10 @@ router.get('/analytics/deep', requirePerm('perm_view_analytics'), async (req, re
       FROM quiz_questions qq
       LEFT JOIN quiz_attempt_answers qa ON qa.question_id = qq.id
       LEFT JOIN quiz_attempts a ON a.id = qa.attempt_id AND a.completed_at >= $1
-      WHERE ($2::uuid IS NULL OR qq.quiz_id = $2::uuid)
+      
+      -- FIX: Changed $2::uuid to $2::bigint to match your database schema
+      WHERE ($2::bigint IS NULL OR qq.quiz_id = $2::bigint)
+      
       GROUP BY qq.id, qq.question_text, qq.correct_answer
       ORDER BY accuracy_pct ASC
       LIMIT 50
@@ -657,7 +660,10 @@ router.get('/analytics/deep', requirePerm('perm_view_analytics'), async (req, re
         END AS band,
         COUNT(*) AS count
       FROM quiz_attempts
-      WHERE completed_at >= $1 AND ($2::uuid IS NULL OR quiz_id = $2::uuid)
+      
+      -- FIX: Changed $2::uuid to $2::bigint to match your database schema
+      WHERE completed_at >= $1 AND ($2::bigint IS NULL OR quiz_id = $2::bigint)
+      
       GROUP BY band ORDER BY band DESC
     `, [since, validQuizId]);
 
@@ -669,10 +675,9 @@ router.get('/analytics/deep', requirePerm('perm_view_analytics'), async (req, re
     });
 
   } catch (err) {
-    // 2. THE FIRE ALARM: Logs the exact SQL error to your Render dashboard
     console.error('🔥 DEEP ANALYTICS CRASH:', err.message);
     
-    // 3. THE FALLBACK: Send empty arrays instead of a 500 error so the frontend UI doesn't crash!
+    // The Fallback: Send empty arrays instead of crashing the UI
     res.json({
       question_stats: [],
       score_distribution: [],
@@ -680,7 +685,6 @@ router.get('/analytics/deep', requirePerm('perm_view_analytics'), async (req, re
     });
   }
 });
-
 router.get('/analytics/export', requirePerm('perm_export_data'), async (req, res) => {
   try {
     const { format = 'xlsx', days = 30 } = req.query;
