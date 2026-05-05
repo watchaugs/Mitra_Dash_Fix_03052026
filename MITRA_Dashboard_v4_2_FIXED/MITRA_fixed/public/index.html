@@ -9059,44 +9059,58 @@ async function loadQuizAnalyticsDeep() {
     console.log("New Role Saved:", role);
     console.log("Analytics Access:", analyticsAccess);
     
-    // Closes the window and shows your toast message
+ // Closes the window and shows your toast message
     closeModal('modal-edit-user');
     if(typeof showToast === 'function') showToast('Permissions Updated!');
 }
-  async function updateLiveDistricts() {
-    // Look for 'nu-state' instead of 'cu-state'
-    const stateName = document.getElementById('nu-state').value;
+  
+// --- SECURE OFFLINE DISTRICT POPULATORS ---
+
+function updateLiveDistricts() {
+    const stateSelect = document.getElementById('nu-state');
     const districtDropdown = document.getElementById('nu-district');
+    if (!districtDropdown || !stateSelect) return;
 
-    if (!districtDropdown) return;
+    // Get the selected text (e.g., "Gujarat")
+    const stateName = stateSelect.options[stateSelect.selectedIndex].text;
+    
+    // Clear the box
+    districtDropdown.innerHTML = '<option value="">Select District</option>';
+    if (!stateName || stateName.includes("All")) return;
 
-    districtDropdown.innerHTML = '<option>⌛ Loading...</option>';
+    // Find the state code (e.g., "GJ") to unlock the local dictionary
+    const stateObj = INDIA_STATES.find(s => s.name === stateName || s.code === stateName);
+    const stateCode = stateObj ? stateObj.code : stateName;
 
-    try {
-        const response = await fetch(`https://api.postalpincode.in/postoffice/${stateName}`);
-        const data = await response.json();
-
-        if (data && data[0].Status === "Success") {
-            const districts = [...new Set(data[0].PostOffice.map(item => item.District))].sort();
-            districtDropdown.innerHTML = '<option value="">Select District</option>';
-            districts.forEach(dist => {
-                districtDropdown.add(new Option(dist, dist));
-            });
-        } else {
-            districtDropdown.innerHTML = '<option>No districts found</option>';
-        }
-    } catch (error) {
-        districtDropdown.innerHTML = '<option>Error loading data</option>';
-    }
+    // Populate from the local secure list
+    const districts = INDIA_DISTRICTS[stateCode] || [];
+    districts.forEach(dist => {
+        districtDropdown.add(new Option(dist, dist));
+    });
 }
   
-async function updateUmDistricts() {
+function updateUmDistricts() {
     const stateSelect = document.getElementById('um-filter-state');
     const districtDropdown = document.getElementById('um-filter-district');
+    if (!districtDropdown || !stateSelect) return;
 
-    // Get the actual text name of the state (e.g., "Gujarat")
+    // Get the selected text
     const stateName = stateSelect.options[stateSelect.selectedIndex].text;
 
+    // Clear the box
+    districtDropdown.innerHTML = '<option value="">All Districts</option>';
+    if (!stateName || stateName.includes("All")) return;
+
+    // Find the state code to unlock the local dictionary
+    const stateObj = INDIA_STATES.find(s => s.name === stateName || s.code === stateName);
+    const stateCode = stateObj ? stateObj.code : stateName;
+
+    // Populate from the local secure list
+    const districts = INDIA_DISTRICTS[stateCode] || [];
+    districts.forEach(dist => {
+        districtDropdown.add(new Option(dist, dist));
+    });
+}
     // If "All States" is selected, reset the district list
     if (!districtDropdown || !stateName || stateName === "All States") {
         if(districtDropdown) districtDropdown.innerHTML = '<option value="">All Districts</option>';
@@ -9106,21 +9120,28 @@ async function updateUmDistricts() {
     districtDropdown.innerHTML = '<option>⌛ Loading...</option>';
 
     try {
-        // Fetching live data from the internet
-        const response = await fetch(`https://api.postalpincode.in/postoffice/${stateName}`);
-        const data = await response.json();
+        function updateUmDistricts() {
+    const stateSelect = document.getElementById('um-filter-state');
+    const districtDropdown = document.getElementById('um-filter-district');
 
-        if (data && data[0].Status === "Success") {
-            const districts = [...new Set(data[0].PostOffice.map(item => item.District))].sort();
-            districtDropdown.innerHTML = '<option value="">All Districts</option>';
-            districts.forEach(dist => {
-                districtDropdown.add(new Option(dist, dist));
-            });
-        } else {
-            districtDropdown.innerHTML = '<option value="">No districts found</option>';
-        }
-    } catch (error) {
-        districtDropdown.innerHTML = '<option value="">Error loading data</option>';
-    }
+    // Get the State Code (e.g., "GJ" for Gujarat)
+    const stateCode = stateSelect.value;
+
+    if (!districtDropdown) return;
+
+    // Reset the district box
+    districtDropdown.innerHTML = '<option value="">All Districts</option>';
+
+    // If no state is selected, stop here
+    if (!stateCode) return;
+
+    // Look up the districts in your local, offline dictionary
+    const districts = INDIA_DISTRICTS[stateCode] || [];
+    
+    // Fill the dropdown
+    districts.forEach(dist => {
+        districtDropdown.add(new Option(dist, dist));
+    });
 }
+      
 </script>
