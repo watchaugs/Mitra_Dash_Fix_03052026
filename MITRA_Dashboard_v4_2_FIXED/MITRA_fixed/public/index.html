@@ -3314,50 +3314,48 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   </div>
 </div>
 
-<!-- ════════════════ EDIT USER MODAL ════════════════ -->
+<!-- ════════════════ EDIT USER MODAL (Redesigned) ════════════════ -->
 <div class="modal-overlay" id="modal-edit-user" style="display:none" onclick="if(event.target===this)closeModal('modal-edit-user')">
-  <div class="modal" style="max-width:700px;width:95%;max-height:90vh;overflow-y:auto">
-    <div class="modal-header">
-      <div class="modal-title">✏️ Edit User</div>
-      <button class="modal-close" onclick="closeModal('modal-edit-user')">✕</button>
-    </div>
+  <div class="modal" style="max-width:580px; width:95%; max-height:90vh; overflow-y:auto; background: var(--card2);">
+    
+    <button class="modal-close" onclick="closeModal('modal-edit-user')">✕</button>
+    
+    <!-- Title matching the screenshot -->
+    <div class="modal-title" id="edit-user-title" style="font-size: 22px; margin-bottom: 2px; font-weight: 700;">Edit: User Name</div>
+    <div id="edit-user-sub" style="color: var(--text2); font-size: 13px; margin-bottom: 16px; text-transform: uppercase;">Role: —</div>
+    
+    <!-- Hidden ID field so the backend knows who we are editing -->
     <input type="hidden" id="eu-id">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:0 4px">
-      <div class="form-row"><label class="lbl">Full Name</label><input class="inp" id="eu-name"></div>
-      <div class="form-row"><label class="lbl">Phone</label><input class="inp" id="eu-phone"></div>
-      <div class="form-row"><label class="lbl">Designation</label><input class="inp" id="eu-designation"></div>
-      <div class="form-row"><label class="lbl">Role</label>
-        <select class="sel" id="eu-role" onchange="applyRolePreset(this.value, 'eu')">
-          <option value="master_admin">Master Admin</option>
-          <option value="admin">Admin</option>
-          <option value="district_officer">District Officer</option>
-          <option value="education_secretary">Education Secretary</option>
-          <option value="dept_education">Dept. of Education</option>
-          <option value="developer">Developer</option>
-          <option value="data_manager">Data Manager</option>
-          <option value="view_only">View Only</option>
-          <option value="analytics_only">Analytics Only</option>
-          <option value="upload_authority">Uploading Authority</option>
+
+    <!-- The exact Role Dropdown you requested -->
+    <div style="margin-bottom: 20px;">
+        <select class="sel" id="user-role-select" onchange="applyRolePreset(this.value, 'eu')" style="width: 100%; padding: 10px; background: var(--bg3); border-radius: 8px;">
+            <option value="master_admin">Master Admin</option>
+            <option value="admin">Admin</option>
+            <option value="district_officer">District Officer</option>
+            <option value="education_secretary">Education Secretary</option>
+            <option value="dept_education">Dept. Of Education</option>
+            <option value="developer">Developer</option>
+            <option value="data_manager">Data Manager</option>
+            <option value="view_only">View Only</option>
         </select>
-      </div>
-      <div class="form-row"><label class="lbl">State</label>
-        <select class="sel" id="eu-state"><option value="">—</option></select>
-      </div>
-      <div class="form-row"><label class="lbl">Status</label>
-        <select class="sel" id="eu-status"><option value="true">Active</option><option value="false">Inactive</option></select>
+    </div>
+
+    <!-- Permissions Grid (Your JS automatically injects the toggles here) -->
+    <div class="perm-grid" id="eu-perms-grid" style="gap: 12px; margin-bottom: 24px;"></div>
+
+    <!-- Account Status & Buttons EXACTLY like the screenshot -->
+    <div style="border-top: 1px solid var(--border); padding-top: 16px;">
+      <div style="font-size: 12px; color: var(--text2); margin-bottom: 12px; font-weight: 600;">Account Status</div>
+      <div style="display:flex; gap: 12px; flex-wrap: wrap;">
+        <button class="btn" id="edit-status-btn" style="background: #10b981; color: #fff; border: none; font-weight: 600;" onclick="toggleUserStatus()">Disable Account</button>
+        <button class="btn" style="background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.25); font-weight: 600;" onclick="resetPassword()">Reset Password</button>
+        <button class="btn" style="background: transparent; color: var(--text2); border: 1px solid var(--border2); font-weight: 600;" onclick="saveNewPermissions()">Save Changes</button>
       </div>
     </div>
-    <div style="margin-top:16px;padding:14px;background:var(--bg3);border-radius:10px;border:1px solid var(--border)">
-      <div style="font-size:13px;font-weight:700;margin-bottom:10px;font-family:'Syne',sans-serif">🔐 Page &amp; Feature Access</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px" id="eu-perms-grid"></div>
-    </div>
-    <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end">
-      <button class="btn btn-s" onclick="closeModal('modal-edit-user')">Cancel</button>
-      <button class="btn btn-p" onclick="saveUserEdit()">💾 Apply Changes</button>
-    </div>
+
   </div>
 </div>
-
 
 <!-- ══════════════════════════════════════════════════════════════
      LEGAL & COMPLIANCE PAGE  (#page-legal)
