@@ -3537,49 +3537,57 @@ function applyRolePreset(role, prefix = 'cu') {
   }
 
   function openEditUser(id, name, phone, role) {
-    // 1. Safely set the hidden ID
+    // 1. Safely set the Hidden ID
     const idField = document.getElementById('eu-id');
     if (idField) idField.value = id;
-    
-    // 2. Safely update the Header Text
+
+    // 2. Set the sleek Header with the name from the button
     const titleEl = document.getElementById('edit-user-title');
-    if (titleEl) titleEl.innerText = `Edit: ${name}`;
-    
-    // 3. Safely update the Sub-Header Text (Role)
+    if (titleEl) titleEl.innerText = `Edit: ${name || 'User'}`;
+
+    // 3. Set the Sub-header (Role)
     const subEl = document.getElementById('edit-user-sub');
-    if (subEl && role) {
-        subEl.innerText = `Role: ${role.replace('_', ' ').toUpperCase()}`;
-    }
-    
-    // 4. Safely set the custom Role Dropdown
+    if (subEl) subEl.innerText = `Role: ${(role || '').replace('_', ' ').toUpperCase()}`;
+
+    // 4. Set the custom Role Dropdown
     const roleDropdown = document.getElementById('user-role-select');
-    if (roleDropdown && role) {
-        roleDropdown.value = role;
+    if (roleDropdown) roleDropdown.value = role;
+
+    // 5. Build Permissions Grid if it's empty
+    if (typeof renderPermGrid === 'function') {
+      const grid = document.getElementById('eu-perms-grid');
+      if (grid && grid.innerHTML.trim() === '') {
+        renderPermGrid('eu-perms-grid', 'eu');
+      }
     }
-    
-    // 5. Build the Toggle Buttons safely
-    const grid = document.getElementById('eu-perms-grid');
-    if (grid && grid.innerHTML.trim() === '') {
-      renderPermGrid('eu-perms-grid', 'eu');
+
+    // 6. Flip the correct toggles for this role
+    if (typeof applyRolePreset === 'function') {
+      applyRolePreset(role, 'eu');
     }
-    
-    // 6. Automatically turn toggles on/off based on the role
-    if (role) {
-        applyRolePreset(role, 'eu');
+
+    // 7. Open the window safely
+    if (typeof openModal === 'function') {
+      openModal('modal-edit-user');
+    } else {
+      const modal = document.getElementById('modal-edit-user');
+      if (modal) modal.classList.add('open');
     }
-    
-    // 7. Open the window
-    openModal('modal-edit-user');
   }
 
   function saveUserEdit() {
-    closeModal('modal-edit-user');
-    showToast('💾 User access updated successfully!');
+    if (typeof closeModal === 'function') {
+        closeModal('modal-edit-user');
+    } else {
+        const modal = document.getElementById('modal-edit-user');
+        if (modal) modal.classList.remove('open');
+    }
+    if (typeof showToast === 'function') showToast('💾 User access updated successfully!');
   }
 
   // Build the toggles for the "Create User" window as soon as the page loads
   document.addEventListener('DOMContentLoaded', () => {
-    renderPermGrid('cu-perms-grid', 'cu');
+    if (typeof renderPermGrid === 'function') renderPermGrid('cu-perms-grid', 'cu');
   });
   let chartsInitialized = false;
 
