@@ -8540,34 +8540,64 @@ async function bulkDelete() {
 }
 
 function openEditUser(id) {
-  const u = umAllUsers.find(u=>u.id===id);
+  // 1. Find the user in your database array
+  const u = umAllUsers.find(user => user.id === id);
   if (!u) return;
-  document.getElementById('eu-id').value = id;
-  document.getElementById('eu-name').value = u.full_name||'';
-  document.getElementById('eu-phone').value = u.phone||'';
-  document.getElementById('eu-designation').value = u.designation||'';
-  document.getElementById('eu-role').value = u.role||'view_only';
-  document.getElementById('eu-status').value = u.is_active?'true':'false';
-  // Populate state
-  const stateEl = document.getElementById('eu-state');
-  if (stateEl && typeof INDIA_STATES !== 'undefined') {
-    while (stateEl.options.length > 1) stateEl.remove(1);
-    INDIA_STATES.forEach(s => { const o = new Option(s.name, s.name); if(s.name===u.assigned_state) o.selected=true; stateEl.appendChild(o); });
+
+  // 2. Set the Hidden ID
+  const idField = document.getElementById('eu-id');
+  if (idField) idField.value = id;
+
+  // 3. Set the sleek Header and Sub-header with the user's data
+  const titleEl = document.getElementById('edit-user-title');
+  if (titleEl) titleEl.innerText = `Edit: ${u.full_name || 'User'}`;
+
+  const role = u.role || 'view_only';
+  const subEl = document.getElementById('edit-user-sub');
+  if (subEl) subEl.innerText = `Role: ${role.replace('_', ' ').toUpperCase()}`;
+
+  // 4. Set the custom Role Dropdown
+  const roleDropdown = document.getElementById('user-role-select');
+  if (roleDropdown) roleDropdown.value = role;
+
+  // 5. Build Permissions Grid (using your exact backend function)
+  if (typeof buildPermsGrid === 'function') {
+    buildPermsGrid('eu-perms-grid', role);
   }
-  buildPermsGrid('eu-perms-grid', u.role);
+
+  // 6. Sync the Status Button color to match their active status
+  const statusBtn = document.getElementById('edit-status-btn');
+  if (statusBtn) {
+    if (u.is_active) {
+      statusBtn.innerText = 'Disable Account';
+      statusBtn.style.background = '#10b981';
+      statusBtn.style.borderColor = '#10b981';
+      statusBtn.style.color = '#fff';
+    } else {
+      statusBtn.innerText = 'Enable Account';
+      statusBtn.style.background = 'rgba(239, 68, 68, 0.15)';
+      statusBtn.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+      statusBtn.style.color = '#fca5a5';
+    }
+  }
+
   openModal('modal-edit-user');
 }
 
 async function saveUserEdit() {
   const id = document.getElementById('eu-id')?.value;
+  const u = umAllUsers.find(user => user.id === id); // Grab existing backend data
+
+  // Preserve the old data (name, phone, state), but update Role and Permissions from the new sleek UI
   const payload = {
-    full_name:   document.getElementById('eu-name')?.value,
-    phone:       document.getElementById('eu-phone')?.value,
-    designation: document.getElementById('eu-designation')?.value,
-    role:        document.getElementById('eu-role')?.value,
-    is_active:   document.getElementById('eu-status')?.value === 'true',
-    assigned_state: document.getElementById('eu-state')?.value,
-    permissions: getCheckedPerms('eu-perms-grid'),
+    full_name:      u?.full_name,
+    phone:          u?.phone,
+    designation:    u?.designation,
+    assigned_state: u?.assigned_state,
+    is_active:      u?.is_active,
+
+    role:           document.getElementById('user-role-select')?.value || u?.role,
+    permissions:    typeof getCheckedPerms === 'function' ? getCheckedPerms('eu-perms-grid') : [],
   };
   const data = await safeFetch(`/api/users/${id}`, { method:'PUT', body:JSON.stringify(payload) }, true);
   const u = getSeedUsers().find(u=>u.id===id);
