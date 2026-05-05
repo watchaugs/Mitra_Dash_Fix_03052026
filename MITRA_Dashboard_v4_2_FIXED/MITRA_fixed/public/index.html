@@ -8586,25 +8586,33 @@ function openEditUser(id) {
 
 async function saveUserEdit() {
   const id = document.getElementById('eu-id')?.value;
-  const u = umAllUsers.find(user => user.id === id); // Grab existing backend data
+  
+  // 1. Grab the existing data using a unique variable name
+  const existingUser = umAllUsers.find(user => user.id === id); 
 
-  // Preserve the old data (name, phone, state), but update Role and Permissions from the new sleek UI
+  // 2. Build the payload, mixing old preserved data with new UI data
   const payload = {
-    full_name:      u?.full_name,
-    phone:          u?.phone,
-    designation:    u?.designation,
-    assigned_state: u?.assigned_state,
-    is_active:      u?.is_active,
+    full_name:      existingUser?.full_name,
+    phone:          existingUser?.phone,
+    designation:    existingUser?.designation,
+    assigned_state: existingUser?.assigned_state,
+    is_active:      existingUser?.is_active,
 
-    role:           document.getElementById('user-role-select')?.value || u?.role,
+    role:           document.getElementById('user-role-select')?.value || existingUser?.role,
     permissions:    typeof getCheckedPerms === 'function' ? getCheckedPerms('eu-perms-grid') : [],
   };
+
+  // 3. Send it to the server
   const data = await safeFetch(`/api/users/${id}`, { method:'PUT', body:JSON.stringify(payload) }, true);
-  const u = getSeedUsers().find(u=>u.id===id);
+  
+  // 4. Update the local UI list
+  const u = getSeedUsers().find(user => user.id === id);
   if (u) Object.assign(u, payload);
+  
   showToast('✅ User updated successfully');
   closeModal('modal-edit-user');
-  loadUserList();
+  
+  if (typeof loadUserList === 'function') loadUserList();
 }
 
 async function createUser() {
