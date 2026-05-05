@@ -225,8 +225,9 @@ router.post('/:id/reset-password', requirePerm('perm_create_users'), async (req,
     const hash = await bcrypt.hash(new_password, 12);
     await query('UPDATE users SET password_hash=$1, updated_at=NOW() WHERE id=$2', [hash, req.params.id]);
     res.json({ message: 'Password reset successfully' });
-  } catch (err) {
-    res.status(500).json({ error: 'Password reset failed' });
+  } catch (error) {
+    console.error("🔥 ACTUAL DATABASE CRASH:", error); // <-- Add this line!
+    res.status(500).json({ error: "Failed to update user" });
   }
 });
 
