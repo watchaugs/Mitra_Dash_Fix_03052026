@@ -145,11 +145,32 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .toggle-wrap input:checked+.toggle-slider{background:var(--accent)}
 .toggle-wrap input:checked+.toggle-slider::before{transform:translateX(16px);background:#fff}
 
+/* ── USER DROPDOWN MENU ── */
+.topbar-right { position: relative; }
+.user-dropdown-menu {
+  position: absolute; top: 56px; right: 24px; background: var(--card2);
+  border: 1px solid var(--border2); border-radius: 12px; width: 200px;
+  padding: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  display: none; flex-direction: column; z-index: 1000;
+}
+.user-dropdown-menu.show { display: flex; }
+.ud-header { padding: 8px 12px; cursor: default; }
+.ud-divider { height: 1px; background: var(--border); margin: 6px 0; }
+.ud-item {
+  background: transparent; border: none; color: var(--text);
+  padding: 10px 12px; text-align: left; font-size: 13px; font-family: 'DM Sans', sans-serif;
+  border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px;
+}
+.ud-item:hover { background: var(--glow); color: var(--accent); }
+.ud-item.logout { color: #fca5a5; }
+.ud-item.logout:hover { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+  
 /* ── MODAL ── */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
 .modal-bg.open{display:flex}
 .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .modal-body{margin-top:0}
+  
 /* ── CONTEXT MENU ── */
 .ctx-item{padding:9px 14px;border-radius:8px;font-size:13px;cursor:pointer;transition:.12s;color:var(--text)}
 .ctx-item:hover{background:var(--glow)}
@@ -842,11 +863,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="tn" data-page="notifications" onclick="showPage('notifications',this)">🔔 Notifications</button>
     <button class="tn" data-page="users" onclick="showPage('users',this)">👥 User Management</button>
     <button class="tn" data-page="legal" onclick="showPage('legal',this)">⚖️ Legal &amp; Compliance</button>
-    <button class="tn" data-page="settings" onclick="showPage('settings',this)">⚙️ Settings</button>
   </div>
   <div class="topbar-right">
     <span class="pill admin">MASTER ADMIN</span>
-    <div class="avatar-btn" title="Admin">AD</div>
+    <div class="avatar-btn" title="Admin" style="cursor:pointer;" onclick="toggleUserMenu(event)">AD</div>
+    
+    <!-- New Dropdown Menu -->
+    <div id="user-dropdown" class="user-dropdown-menu">
+      <div class="ud-header">
+        <div style="font-weight: 600; color: #fff; font-size: 14px;">Master Admin</div>
+        <div style="font-size: 11px; color: var(--text2);">admin@mitra.gov.in</div>
+      </div>
+      <div class="ud-divider"></div>
+      
+      <!-- Settings moved here -->
+      <button class="ud-item" onclick="showPage('settings'); closeUserMenu()">⚙️ Settings</button>
+      
+      <div class="ud-divider"></div>
+      <button class="ud-item logout" onclick="doLogout()">🚪 Sign Out</button>
+    </div>
   </div>
 </div>
 
@@ -863,7 +898,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="sb-btn" title="Legal &amp; Compliance" onclick="showPage('legal',null,this)">⚖️</div>
   <div class="sb-divider"></div>
   <div class="sb-btn" title="User Management" aria-label="User Management" onclick="showPage('users',null,this)">👥</div>
-  <div class="sb-btn" title="Settings" aria-label="Settings" onclick="showPage('settings',null,this)">⚙️</div>
 </div>
 
 <div class="main" id="main">
@@ -3635,6 +3669,40 @@ function showToast(msg) {
   t.innerText = msg;
   t.style.opacity = 1;
   setTimeout(() => { t.style.opacity = 0; }, 3000);
+}
+
+// --- USER DROPDOWN & LOGOUT LOGIC ---
+function toggleUserMenu(event) {
+  event.stopPropagation();
+  document.getElementById('user-dropdown').classList.toggle('show');
+}
+
+function closeUserMenu() {
+  const menu = document.getElementById('user-dropdown');
+  if (menu) menu.classList.remove('show');
+}
+
+// Click anywhere else on the screen to close the menu
+document.addEventListener('click', function(event) {
+  const menu = document.getElementById('user-dropdown');
+  if (menu && menu.classList.contains('show') && !menu.contains(event.target)) {
+    closeUserMenu();
+  }
+});
+
+function doLogout() {
+  closeUserMenu();
+  // Bring the login screen back up
+  const loginOverlay = document.getElementById('mitra-login-overlay');
+  if (loginOverlay) {
+    loginOverlay.classList.remove('hidden');
+    loginOverlay.style.display = 'flex';
+  }
+  // Clear the password field for security
+  const passInput = document.getElementById('login-pass');
+  if (passInput) passInput.value = '';
+  
+  if (typeof showToast === 'function') showToast('🚪 Logged out successfully');
 }
 
 // --- CURRICULUM TREE MANAGEMENT ---
