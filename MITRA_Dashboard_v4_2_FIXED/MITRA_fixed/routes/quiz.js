@@ -619,14 +619,15 @@ router.get('/analytics', requirePerm('perm_view_analytics'), async (req, res) =>
 
 // ── Export quiz analytics ──────────────────────────────────────────────────────
 
-// GET /api/quiz/analytics/deep — FIX: Crash-proof Deep Analytics endpoint
+// GET /api/quiz/analytics/deep — FIX: Scope and Type-safe Analytics endpoint
 router.get('/analytics/deep', requirePerm('perm_view_analytics'), async (req, res) => {
-  try {
-    const { quiz_id, days = 30 } = req.query;
-    const since = new Date(Date.now() - parseInt(days) * 86400000).toISOString();
+  
+  // 1. THE SCOPE FIX: Define variables OUTSIDE the try/catch so both blocks can use them safely
+  const { quiz_id, days = 30 } = req.query;
+  const validQuizId = (quiz_id && quiz_id.trim() !== '') ? quiz_id : null;
 
-    // Prevent empty string crashes
-    const validQuizId = (quiz_id && quiz_id.trim() !== '') ? quiz_id : null;
+  try {
+    const since = new Date(Date.now() - parseInt(days) * 86400000).toISOString();
 
     // Per-question analysis
     const questionStats = await query(`
@@ -641,7 +642,7 @@ router.get('/analytics/deep', requirePerm('perm_view_analytics'), async (req, re
       LEFT JOIN quiz_attempt_answers qa ON qa.question_id = qq.id
       LEFT JOIN quiz_attempts a ON a.id = qa.attempt_id AND a.completed_at >= $1
       
-      -- FIX: Changed $2::uuid to $2::bigint to match your database schema
+      -- 2. THE SQL FIX: Use ::bigint to match your database schema
       WHERE ($2::bigint IS NULL OR qq.quiz_id = $2::bigint)
       
       GROUP BY qq.id, qq.question_text, qq.correct_answer
@@ -661,13 +662,12 @@ router.get('/analytics/deep', requirePerm('perm_view_analytics'), async (req, re
         COUNT(*) AS count
       FROM quiz_attempts
       
-      -- FIX: Changed $2::uuid to $2::bigint to match your database schema
+      -- 2. THE SQL FIX: Use ::bigint here as well
       WHERE completed_at >= $1 AND ($2::bigint IS NULL OR quiz_id = $2::bigint)
       
       GROUP BY band ORDER BY band DESC
     `, [since, validQuizId]);
 
-    // Success! Send the raw data to the frontend
     res.json({
       question_stats:     questionStats.rows,
       score_distribution: distribution.rows,
@@ -677,14 +677,15 @@ router.get('/analytics/deep', requirePerm('perm_view_analytics'), async (req, re
   } catch (err) {
     console.error('🔥 DEEP ANALYTICS CRASH:', err.message);
     
-    // The Fallback: Send empty arrays instead of crashing the UI
+    // 3. THE FALLBACK: Safely return empty arrays using the globally scoped `days` variable
     res.json({
       question_stats: [],
       score_distribution: [],
-      period_days: parseInt(days || 30)
+      period_days: parseInt(days)
     });
   }
 });
+
 router.get('/analytics/export', requirePerm('perm_export_data'), async (req, res) => {
   try {
     const { format = 'xlsx', days = 30 } = req.query;
