@@ -3315,48 +3315,72 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </div>
 
 <!-- ════════════════ EDIT USER MODAL (Redesigned) ════════════════ -->
+<style>
+  /* Sleek styling specifically for this popup to match your screenshot */
+  #modal-edit-user .modal {
+    background: #151b2b;
+    border: 1px solid #253554;
+    border-radius: 16px;
+  }
+  #modal-edit-user .perm-item {
+    background: #111827;
+    border: 1px solid #253554;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #e2e8f0;
+  }
+  #modal-edit-user .toggle-slider { background: #1e2d4a; }
+  #modal-edit-user input:checked + .toggle-slider { background: #6366f1; }
+  #modal-edit-user .btn-action {
+    padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;
+  }
+</style>
+
 <div class="modal-overlay" id="modal-edit-user" style="display:none" onclick="if(event.target===this)closeModal('modal-edit-user')">
-  <div class="modal" style="max-width:580px; width:95%; max-height:90vh; overflow-y:auto; background: var(--card2);">
+  <div class="modal" style="max-width:600px; width:95%; max-height:90vh; overflow-y:auto;">
     
-    <button class="modal-close" onclick="closeModal('modal-edit-user')">✕</button>
+    <button class="modal-close" onclick="closeModal('modal-edit-user')" style="color: #94a3b8;">✕</button>
     
     <!-- Title matching the screenshot -->
-    <div class="modal-title" id="edit-user-title" style="font-size: 22px; margin-bottom: 2px; font-weight: 700;">Edit: User Name</div>
-    <div id="edit-user-sub" style="color: var(--text2); font-size: 13px; margin-bottom: 16px; text-transform: uppercase;">Role: —</div>
+    <div class="modal-title" id="edit-user-title" style="font-size: 20px; font-weight: 800; color: #fff; margin-bottom: 4px;">Edit: User Name</div>
     
-    <!-- Hidden ID field so the backend knows who we are editing -->
-    <input type="hidden" id="eu-id">
-
-    <!-- The exact Role Dropdown you requested -->
-    <div style="margin-bottom: 20px;">
-        <select class="sel" id="user-role-select" onchange="applyRolePreset(this.value, 'eu')" style="width: 100%; padding: 10px; background: var(--bg3); border-radius: 8px;">
-            <option value="master_admin">Master Admin</option>
-            <option value="admin">Admin</option>
-            <option value="district_officer">District Officer</option>
-            <option value="education_secretary">Education Secretary</option>
-            <option value="dept_education">Dept. Of Education</option>
-            <option value="developer">Developer</option>
-            <option value="data_manager">Data Manager</option>
-            <option value="view_only">View Only</option>
-        </select>
+    <!-- Seamless Role Dropdown -->
+    <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 24px;">
+      <span style="color: #94a3b8; font-size: 13px;">Role:</span>
+      <select class="sel" id="user-role-select" onchange="applyRolePreset(this.value, 'eu')" style="width: auto; padding: 2px 8px; background: transparent; border: none; color: #94a3b8; font-size: 13px; text-transform: uppercase; cursor: pointer; outline: none; -webkit-appearance: none; appearance: none;">
+        <option value="master_admin">Master Admin</option>
+        <option value="admin">Admin</option>
+        <option value="district_officer">District Officer</option>
+        <option value="education_secretary">Education Secretary</option>
+        <option value="dept_education">Dept. Of Education</option>
+        <option value="developer">Developer</option>
+        <option value="data_manager">Data Manager</option>
+        <option value="view_only">View Only</option>
+      </select>
+      <span style="color: #94a3b8; font-size: 10px; pointer-events: none;">▼</span>
     </div>
 
-    <!-- Permissions Grid (Your JS automatically injects the toggles here) -->
-    <div class="perm-grid" id="eu-perms-grid" style="gap: 12px; margin-bottom: 24px;"></div>
+    <!-- Hidden ID field -->
+    <input type="hidden" id="eu-id">
+
+    <!-- Permissions Grid (JS auto-injects toggles here) -->
+    <div class="perm-grid" id="eu-perms-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px;"></div>
 
     <!-- Account Status & Buttons EXACTLY like the screenshot -->
-    <div style="border-top: 1px solid var(--border); padding-top: 16px;">
-      <div style="font-size: 12px; color: var(--text2); margin-bottom: 12px; font-weight: 600;">Account Status</div>
+    <div style="border-top: 1px solid #253554; padding-top: 20px;">
+      <div style="font-size: 13px; color: #94a3b8; margin-bottom: 12px; font-weight: 600;">Account Status</div>
       <div style="display:flex; gap: 12px; flex-wrap: wrap;">
-        <button class="btn" id="edit-status-btn" style="background: #10b981; color: #fff; border: none; font-weight: 600;" onclick="toggleUserStatus()">Disable Account</button>
-        <button class="btn" style="background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.25); font-weight: 600;" onclick="resetPassword()">Reset Password</button>
-        <button class="btn" style="background: transparent; color: var(--text2); border: 1px solid var(--border2); font-weight: 600;" onclick="saveNewPermissions()">Save Changes</button>
+        <button class="btn-action" id="edit-status-btn" style="background: #10b981; color: #fff; border: none;" onclick="toggleUserStatus()">Disable Account</button>
+        <button class="btn-action" style="background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);" onclick="resetPassword()">Reset Password</button>
+        <button class="btn-action" style="background: transparent; color: #94a3b8; border: 1px solid #253554;" onclick="saveNewPermissions()">Save Changes</button>
       </div>
     </div>
 
   </div>
 </div>
-
+  
 <!-- ══════════════════════════════════════════════════════════════
      LEGAL & COMPLIANCE PAGE  (#page-legal)
 ══════════════════════════════════════════════════════════════ -->
@@ -3512,15 +3536,12 @@ function applyRolePreset(role, prefix = 'cu') {
   }
 
   function openEditUser(id, name, phone, role) {
-    // 1. Set the hidden ID and update the Header Text from screenshot
+    // 1. Set ID and Title
     const idField = document.getElementById('eu-id');
     if (idField) idField.value = id;
     
     const titleEl = document.getElementById('edit-user-title');
     if (titleEl) titleEl.innerText = `Edit: ${name}`;
-    
-    const subEl = document.getElementById('edit-user-sub');
-    if (subEl) subEl.innerText = `Role: ${role.replace('_', ' ').toUpperCase()}`;
     
     // 2. Set the custom Role Dropdown
     const roleDropdown = document.getElementById('user-role-select');
@@ -3531,6 +3552,13 @@ function applyRolePreset(role, prefix = 'cu') {
     if (grid && grid.innerHTML.trim() === '') {
       renderPermGrid('eu-perms-grid', 'eu');
     }
+    
+    // 4. Automatically turn toggles on/off based on the role
+    applyRolePreset(role, 'eu');
+    
+    // 5. Open window
+    openModal('modal-edit-user');
+  }
     
     // 4. Automatically turn toggles on/off based on the role
     applyRolePreset(role, 'eu');
