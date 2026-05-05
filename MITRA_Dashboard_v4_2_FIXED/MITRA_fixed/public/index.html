@@ -580,56 +580,48 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   </div>
 </div>
 
-<div class="modal-bg" id="modal-edit-user">
-  <div class="modal">
+<!-- ════════════════ EDIT USER MODAL (Redesigned) ════════════════ -->
+<div class="modal-overlay" id="modal-edit-user" style="display:none" onclick="if(event.target===this)closeModal('modal-edit-user')">
+  <div class="modal" style="max-width:580px; width:95%; max-height:90vh; overflow-y:auto; background: var(--card2);">
+    
     <button class="modal-close" onclick="closeModal('modal-edit-user')">✕</button>
-    <div class="modal-title" id="edit-user-title">Edit Permissions</div>
-    <div class="modal-sub" id="edit-user-sub">Adjust feature access and rights</div>
-    <div class="perm-grid" id="edit-perm-grid">
-  <!-- Role Selection -->
-  <div style="margin-bottom: 20px;">
-    <div class="lbl" style="margin-bottom:8px">User Role</div>
-    <select id="user-role-select" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); background: var(--bg-card); color: var(--text-main);">
-      <option value="admin">Administrator</option>
-      <option value="teacher">Teacher</option>
-      <option value="viewer">Viewer</option>
-    </select>
-  </div>
+    
+    <!-- Title matching the screenshot -->
+    <div class="modal-title" id="edit-user-title" style="font-size: 22px; margin-bottom: 2px; font-weight: 700;">Edit: User Name</div>
+    <div id="edit-user-sub" style="color: var(--text2); font-size: 13px; margin-bottom: 16px; text-transform: uppercase;">Role: —</div>
+    
+    <!-- Hidden ID field so the backend knows who we are editing -->
+    <input type="hidden" id="eu-id">
 
-  <div class="lbl" style="margin-bottom:12px">Access Permissions</div>
-  
-  <!-- Modern Toggle Buttons -->
-  <div style="display: flex; flex-direction: column; gap: 12px;">
-    <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-      <span>Analytics Dashboard</span>
-      <input type="checkbox" class="tgl-btn" id="p-analytics" checked>
-    </label>
-    <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-      <span>Quiz Builder</span>
-      <input type="checkbox" class="tgl-btn" id="p-quiz">
-    </label>
-    <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-      <span>User Management</span>
-      <input type="checkbox" class="tgl-btn" id="p-users">
-    </label>
-    <label style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-      <span>Settings & Legal</span>
-      <input type="checkbox" class="tgl-btn" id="p-settings">
-    </label>
-  </div>
-</div>
-    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">
-      <div class="lbl" style="margin-bottom:10px">Account Status</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-g btn-sm" id="edit-status-btn" onclick="toggleUserStatus()">Disable Account</button>
-        <button class="btn btn-r btn-sm" onclick="resetPassword()">Reset Password</button>
-        <button class="btn btn-s btn-sm" onclick="saveNewPermissions()">Save Changes</button>
+    <!-- The exact Role Dropdown you requested -->
+    <div style="margin-bottom: 20px;">
+        <select class="sel" id="user-role-select" onchange="applyRolePreset(this.value, 'eu')" style="width: 100%; padding: 10px; background: var(--bg3); border-radius: 8px;">
+            <option value="master_admin">Master Admin</option>
+            <option value="admin">Admin</option>
+            <option value="district_officer">District Officer</option>
+            <option value="education_secretary">Education Secretary</option>
+            <option value="dept_education">Dept. Of Education</option>
+            <option value="developer">Developer</option>
+            <option value="data_manager">Data Manager</option>
+            <option value="view_only">View Only</option>
+        </select>
+    </div>
+
+    <!-- Permissions Grid (Your JS automatically injects the 10 toggles here) -->
+    <div class="perm-grid" id="eu-perms-grid" style="gap: 12px; margin-bottom: 24px;"></div>
+
+    <!-- Account Status & Buttons EXACTLY like the screenshot -->
+    <div style="border-top: 1px solid var(--border); padding-top: 16px;">
+      <div style="font-size: 12px; color: var(--text2); margin-bottom: 12px; font-weight: 600;">Account Status</div>
+      <div style="display:flex; gap: 12px; flex-wrap: wrap;">
+        <button class="btn" id="edit-status-btn" style="background: #10b981; color: #fff; border: none; font-weight: 600;" onclick="toggleUserStatus()">Disable Account</button>
+        <button class="btn" style="background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.25); font-weight: 600;" onclick="resetPassword()">Reset Password</button>
+        <button class="btn" style="background: transparent; color: var(--text2); border: 1px solid var(--border2); font-weight: 600;" onclick="saveNewPermissions()">Save Changes</button>
       </div>
     </div>
+
   </div>
 </div>
-
-<div class="modal-bg" id="modal-geo-config">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-geo-config')">✕</button>
     <div class="modal-title">Configure Geofence</div>
@@ -3514,7 +3506,7 @@ const APP_PERMISSIONS = [
     `).join('');
   }
 
-  function applyRolePreset(role, prefix = 'cu') {
+function applyRolePreset(role, prefix = 'cu') {
     APP_PERMISSIONS.forEach(p => {
       const cb = document.getElementById(`${prefix}-${p.id}`);
       if (cb) cb.checked = p.defaultRoles.includes(role);
@@ -3522,24 +3514,30 @@ const APP_PERMISSIONS = [
   }
 
   function openEditUser(id, name, phone, role) {
-    // Fill in the text boxes
-    document.getElementById('eu-id').value = id;
-    document.getElementById('eu-name').value = name;
-    document.getElementById('eu-phone').value = phone;
+    // 1. Set the hidden ID and update the Header Text from screenshot
+    const idField = document.getElementById('eu-id');
+    if (idField) idField.value = id;
     
-    // Set the Dropdown
-    const roleDropdown = document.getElementById('eu-role');
+    const titleEl = document.getElementById('edit-user-title');
+    if (titleEl) titleEl.innerText = `Edit: ${name}`;
+    
+    const subEl = document.getElementById('edit-user-sub');
+    if (subEl) subEl.innerText = `Role: ${role.replace('_', ' ').toUpperCase()}`;
+    
+    // 2. Set the custom Role Dropdown
+    const roleDropdown = document.getElementById('user-role-select');
     if (roleDropdown) roleDropdown.value = role;
     
-    // Build the Toggle Buttons if they aren't there yet
+    // 3. Build the Toggle Buttons if they aren't there yet
     const grid = document.getElementById('eu-perms-grid');
     if (grid && grid.innerHTML.trim() === '') {
       renderPermGrid('eu-perms-grid', 'eu');
     }
     
-    // Automatically turn toggles on/off based on the role
+    // 4. Automatically turn toggles on/off based on the role
     applyRolePreset(role, 'eu');
     
+    // 5. Open the sleek new window
     openModal('modal-edit-user');
   }
 
