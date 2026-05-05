@@ -3154,7 +3154,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <!-- Filters & Search -->
   <div class="filter-bar" style="margin-bottom:16px">
     <div class="filter-group"><label class="lbl">State</label>
-      <select class="sel" id="um-filter-state" onchange="loadUserList()"><option value="">All States</option></select>
+      <select class="sel" id="um-filter-state" onchange="updateUmDistricts(); loadUserList()"><option value="">All States</option></select>
     </div>
     <div class="filter-group"><label class="lbl">District</label>
       <select class="sel" id="um-filter-district" onchange="loadUserList()"><option value="">All Districts</option></select>
@@ -4339,7 +4339,7 @@ function populateAllLocationDropdowns() {
   ];
 
   // Populate state dropdowns
-  const stateDropdownIds = ['hier-state','rp-state','qc-state','qa-state','notif-state'];
+  const stateDropdownIds = ['hier-state','rp-state','qc-state','qa-state','notif-state','um-filter-state','eu-state'];
   // Also populate hier-add-state
   const hierAddState = document.getElementById('hier-add-state');
   if (hierAddState) {
@@ -9090,4 +9090,37 @@ async function loadQuizAnalyticsDeep() {
     }
 }
   
+async function updateUmDistricts() {
+    const stateSelect = document.getElementById('um-filter-state');
+    const districtDropdown = document.getElementById('um-filter-district');
+
+    // Get the actual text name of the state (e.g., "Gujarat")
+    const stateName = stateSelect.options[stateSelect.selectedIndex].text;
+
+    // If "All States" is selected, reset the district list
+    if (!districtDropdown || !stateName || stateName === "All States") {
+        if(districtDropdown) districtDropdown.innerHTML = '<option value="">All Districts</option>';
+        return;
+    }
+
+    districtDropdown.innerHTML = '<option>⌛ Loading...</option>';
+
+    try {
+        // Fetching live data from the internet
+        const response = await fetch(`https://api.postalpincode.in/postoffice/${stateName}`);
+        const data = await response.json();
+
+        if (data && data[0].Status === "Success") {
+            const districts = [...new Set(data[0].PostOffice.map(item => item.District))].sort();
+            districtDropdown.innerHTML = '<option value="">All Districts</option>';
+            districts.forEach(dist => {
+                districtDropdown.add(new Option(dist, dist));
+            });
+        } else {
+            districtDropdown.innerHTML = '<option value="">No districts found</option>';
+        }
+    } catch (error) {
+        districtDropdown.innerHTML = '<option value="">Error loading data</option>';
+    }
+}
 </script>
