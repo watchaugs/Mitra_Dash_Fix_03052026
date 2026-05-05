@@ -536,7 +536,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     </div>
     <div class="form-row">
       <label class="lbl">Assign State / Region</label>
-      <select class="sel" id="nu-state">
+      <div class="form-row">
+  <label class="lbl">District</label>
+  <select class="sel" id="nu-district">
+    <option value="">Select State First</option>
+  </select>
+</div>
+      <!-- Change nu-state to trigger the live district fetcher -->
+      <select class="sel" id="nu-state" onchange="updateLiveDistricts()">
         <option>All India</option>
         <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
         <option>Bihar</option><option>Chhattisgarh</option><option>Goa</option><option>Gujarat</option>
@@ -9055,6 +9062,32 @@ async function loadQuizAnalyticsDeep() {
     // Closes the window and shows your toast message
     closeModal('modal-edit-user');
     if(typeof showToast === 'function') showToast('Permissions Updated!');
+}
+  async function updateLiveDistricts() {
+    // Look for 'nu-state' instead of 'cu-state'
+    const stateName = document.getElementById('nu-state').value;
+    const districtDropdown = document.getElementById('nu-district');
+
+    if (!districtDropdown) return;
+
+    districtDropdown.innerHTML = '<option>⌛ Loading...</option>';
+
+    try {
+        const response = await fetch(`https://api.postalpincode.in/postoffice/${stateName}`);
+        const data = await response.json();
+
+        if (data && data[0].Status === "Success") {
+            const districts = [...new Set(data[0].PostOffice.map(item => item.District))].sort();
+            districtDropdown.innerHTML = '<option value="">Select District</option>';
+            districts.forEach(dist => {
+                districtDropdown.add(new Option(dist, dist));
+            });
+        } else {
+            districtDropdown.innerHTML = '<option>No districts found</option>';
+        }
+    } catch (error) {
+        districtDropdown.innerHTML = '<option>Error loading data</option>';
+    }
 }
   
 </script>
