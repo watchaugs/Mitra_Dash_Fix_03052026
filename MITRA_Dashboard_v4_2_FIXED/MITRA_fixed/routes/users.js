@@ -227,7 +227,7 @@ router.post('/:id/reset-password', requirePerm('perm_create_users'), async (req,
     res.json({ message: 'Password reset successfully' });
   } catch (error) {
     console.error("🔥 ACTUAL DATABASE CRASH:", error); // <-- Add this line!
-    res.status(500).json({ error: "Failed to update user" });
+    res.status(500).json({ error: error.message, stack: error.stack });
   }
 });
 
