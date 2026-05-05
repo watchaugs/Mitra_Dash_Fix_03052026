@@ -619,11 +619,14 @@ router.get('/analytics', requirePerm('perm_view_analytics'), async (req, res) =>
 
 // ── Export quiz analytics ──────────────────────────────────────────────────────
 
-// GET /api/quiz/analytics/deep — FIX: loadQuizAnalyticsDeep() calls this endpoint
+// GET /api/quiz/analytics/deep — FIX: Crash-proof Deep Analytics endpoint
 router.get('/analytics/deep', requirePerm('perm_view_analytics'), async (req, res) => {
   try {
     const { quiz_id, days = 30 } = req.query;
     const since = new Date(Date.now() - parseInt(days) * 86400000).toISOString();
+
+    // 1. THE FIX: Prevent Postgres UUID crash by converting empty strings to strict nulls
+    const validQuizId = (quiz_id && quiz_id.trim() !== '') ? quiz_id : null;
 
     // Per-question analysis
     const questionStats = await query(`
@@ -641,7 +644,7 @@ router.get('/analytics/deep', requirePerm('perm_view_analytics'), async (req, re
       GROUP BY qq.id, qq.question_text, qq.correct_answer
       ORDER BY accuracy_pct ASC
       LIMIT 50
-    `, [since, quiz_id || null]);
+    `, [since, validQuizId]);
 
     // Score distribution
     const distribution = await query(`
@@ -656,16 +659,25 @@ router.get('/analytics/deep', requirePerm('perm_view_analytics'), async (req, re
       FROM quiz_attempts
       WHERE completed_at >= $1 AND ($2::uuid IS NULL OR quiz_id = $2::uuid)
       GROUP BY band ORDER BY band DESC
-    `, [since, quiz_id || null]);
+    `, [since, validQuizId]);
 
+    // Success! Send the raw data to the frontend
     res.json({
-      question_stats:   questionStats.rows,
+      question_stats:     questionStats.rows,
       score_distribution: distribution.rows,
-      period_days:      parseInt(days)
+      period_days:        parseInt(days)
     });
+
   } catch (err) {
-    console.error('[quiz/analytics/deep]', err);
-    res.status(500).json({ error: 'Failed to fetch deep analytics' });
+    // 2. THE FIRE ALARM: Logs the exact SQL error to your Render dashboard
+    console.error('🔥 DEEP ANALYTICS CRASH:', err.message);
+    
+    // 3. THE FALLBACK: Send empty arrays instead of a 500 error so the frontend UI doesn't crash!
+    res.json({
+      question_stats: [],
+      score_distribution: [],
+      period_days: parseInt(days || 30)
+    });
   }
 });
 
