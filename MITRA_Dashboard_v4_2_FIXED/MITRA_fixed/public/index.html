@@ -3137,7 +3137,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="hero-title">👥 <span class="grad">User Management</span> — Access &amp; Credentials Center</div>
     <div style="font-size:13px;color:var(--text2);max-width:620px;line-height:1.6">Create dashboard users, assign roles, grant granular page/feature access, and manage bulk credentials for officers across all states and districts.</div>
     <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-      <button class="btn btn-p" onclick="openModal('modal-create-user')">➕ Create User</button>
+      <button class="btn btn-p" onclick="openModal('modal-new-user')">➕ Create User</button>
       <button class="btn btn-s" onclick="document.getElementById('um-xlsx-input').click()">📥 Import XLSX</button>
       <a id="um-template-link" href="#" onclick="downloadUserTemplate(event)" class="btn btn-s" style="text-decoration:none">📄 Download Template</a>
       <input type="file" id="um-xlsx-input" accept=".xlsx,.xls" style="display:none" onchange="handleUserXlsxImport(this)">
