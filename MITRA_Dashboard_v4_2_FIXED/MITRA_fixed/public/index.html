@@ -9052,14 +9052,14 @@ async function loadQuizAnalyticsDeep() {
 //-----------------------------------------
   function saveNewPermissions() {
     // This grabs the data from your new dropdown and toggles
-    const role = document.getElementById('user-role-select').value;
-    const analyticsAccess = document.getElementById('p-analytics').checked;
+    const role = document.getElementById('user-role-select')?.value;
+    const analyticsAccess = document.getElementById('p-analytics')?.checked;
     
     // For now, this just proves it works in your browser logs
     console.log("New Role Saved:", role);
     console.log("Analytics Access:", analyticsAccess);
     
- // Closes the window and shows your toast message
+    // Closes the window and shows your toast message
     closeModal('modal-edit-user');
     if(typeof showToast === 'function') showToast('Permissions Updated!');
 }
@@ -9111,37 +9111,4 @@ function updateUmDistricts() {
         districtDropdown.add(new Option(dist, dist));
     });
 }
-    // If "All States" is selected, reset the district list
-    if (!districtDropdown || !stateName || stateName === "All States") {
-        if(districtDropdown) districtDropdown.innerHTML = '<option value="">All Districts</option>';
-        return;
-    }
-
-    districtDropdown.innerHTML = '<option>⌛ Loading...</option>';
-
-    try {
-        function updateUmDistricts() {
-    const stateSelect = document.getElementById('um-filter-state');
-    const districtDropdown = document.getElementById('um-filter-district');
-
-    // Get the State Code (e.g., "GJ" for Gujarat)
-    const stateCode = stateSelect.value;
-
-    if (!districtDropdown) return;
-
-    // Reset the district box
-    districtDropdown.innerHTML = '<option value="">All Districts</option>';
-
-    // If no state is selected, stop here
-    if (!stateCode) return;
-
-    // Look up the districts in your local, offline dictionary
-    const districts = INDIA_DISTRICTS[stateCode] || [];
-    
-    // Fill the dropdown
-    districts.forEach(dist => {
-        districtDropdown.add(new Option(dist, dist));
-    });
-}
-      
 </script>
